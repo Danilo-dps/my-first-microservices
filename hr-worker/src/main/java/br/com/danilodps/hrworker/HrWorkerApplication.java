@@ -1,4 +1,4 @@
-package br.com.danilodps.hr_worker;
+package br.com.danilodps.hrworker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
