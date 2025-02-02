@@ -1,4 +1,4 @@
-package br.com.danilodps.hr_worker;
+package br.com.danilodps.hrworker;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
