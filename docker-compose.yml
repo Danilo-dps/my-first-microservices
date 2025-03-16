@@ -1,0 +1,96 @@
+services:
+  # Banco de dados hr-worker
+  hr-worker-pg12-study:
+    image: postgres:12-alpine
+    container_name: hr-worker-pg12-study
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: db_hr_worker
+    networks:
+      - study-net
+
+  # Banco de dados hr-user
+  hr-user-pg12-study:
+    image: postgres:12-alpine
+    container_name: hr-user-pg12-study
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: db_hr_user
+    networks:
+      - study-net
+
+  # Servidor de Configuração
+  hr-config-server:
+    build: ./hr-config-server  # Construir a partir do Dockerfile
+    container_name: hr-config-server-study
+    ports:
+      - "8888:8888"
+    networks:
+      - study-net
+    depends_on:
+      - hr-worker-pg12-study
+      - hr-user-pg12-study
+
+  # Outros microservices (construídos a partir dos Dockerfiles)
+  hr-api-gateway-zuul:
+    build: ./hr-api-gateway-zuul  # Construir a partir do Dockerfile
+    container_name: hr-api-gateway-zuul-study
+    ports:
+      - "8765:8765"
+    networks:
+      - study-net
+    depends_on:
+      - hr-config-server
+
+  hr-eureka-server:
+    build: ./hr-eureka-server  # Construir a partir do Dockerfile
+    container_name: hr-eureka-server-study
+    ports:
+      - "8761:8761"
+    networks:
+      - study-net
+    depends_on:
+      - hr-config-server
+
+  hr-oauth:
+    build: ./hr-oauth  # Construir a partir do Dockerfile
+    container_name: hr-oauth-study
+    networks:
+      - study-net
+    depends_on:
+      - hr-config-server
+
+  hr-payroll:
+    build: ./hr-payroll  # Construir a partir do Dockerfile
+    container_name: hr-payroll-study
+    networks:
+      - study-net
+    depends_on:
+      - hr-config-server
+
+  hr-user:
+    build: ./hr-user  # Construir a partir do Dockerfile
+    container_name: hr-user-study
+    networks:
+      - study-net
+    depends_on:
+      - hr-config-server
+      - hr-user-pg12-study
+
+  hr-worker:
+    build: ./hr-worker  # Construir a partir do Dockerfile
+    container_name: hr-worker-study
+    networks:
+      - study-net
+    depends_on:
+      - hr-config-server
+      - hr-worker-pg12-study
+
+# Rede personalizada para estudos
+networks:
+  study-net:
+    driver: bridge
